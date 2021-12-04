@@ -3,6 +3,11 @@ const FuzzyMatching = require('fuzzy-matching');
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
+const nacl = require('tweetnacl');
+const bodyParser = require('body-parser');
+
+// Your public key can be found on your application in the Developer Portal
+const PUBLIC_KEY = "154";
 
 const app = express();
 const canvas = new DragaliaCanvas();
@@ -11,6 +16,14 @@ const PORTRAIT_API = 'https://dlportraits.space/portrait_output/';
 
 let portraitData = null;
 let fm = null;
+
+app.use(bodyParser.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf
+  }
+}));
+
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, '/index.html'));
@@ -185,6 +198,50 @@ async function setupLookup() {
     console.error(error);
   }
 }
+
+function verify(req) {
+  if (!req.get('X-Signature-Ed25519') || !req.get('X-Signature-Timestamp')) {
+    return false;
+  }
+
+  const signature = req.get('X-Signature-Ed25519');
+  const timestamp = req.get('X-Signature-Timestamp');
+  const body = req.rawBody; // rawBody is expected to be a string, not raw bytes
+
+  return nacl.sign.detached.verify(
+    Buffer.from(timestamp + body),
+    Buffer.from(signature, 'hex'),
+    Buffer.from(PUBLIC_KEY, 'hex')
+  );
+}
+
+app.post('/discord', async (req, res) => {
+  if (!verify(req)) {
+    res.status(401).send();
+    return;
+  }
+  const interaction = req.body;
+  if (interaction.type == 1) { // ping
+    res.json({'type': 1}); // pong
+  }
+  if (interaction.type == 2) { // APPLICATION_COMMAND
+    const data = interaction.data;
+    if (data.name == "dldialogue") {
+      const name = data.options[0].value;
+      const message = data.options[1].value;
+      const nameEnc = encodeURI(name);
+      const messageEnc = encodeURI(message);
+      res.json({
+        'type': 4,
+        'data': {
+          'content': "http://api.dldialogue.xyz/" + nameEnc + "/" + messageEnc
+        }
+      });
+    }
+  }
+  res.status(404).send();
+  return;
+})
 
 app.use(express.static('public'));
 const PORT = process.env.PORT || 8000;
