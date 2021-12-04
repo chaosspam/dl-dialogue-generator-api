@@ -42,6 +42,7 @@
     <hr />
 
     <h4 class="h5 mt-5"><code>GET</code> /{type}/{name}/{text}/result.png</h4>
+    <h4 class="h5 mt-5"><code>GET</code> /{name}/{text}/result.png</h4>
     <hr />
     <table class="table">
       <thead>
@@ -90,7 +91,7 @@
             <textarea name="" cols="30" rows="4" oninput="toURI(this.value)" placeholder="Type here to see how characters should be escaped" autocomplete="off"></textarea>
             <script>
               function toURI(val) {
-                document.getElementById('result').innerText = `http://dl-dialogue-generator-api.herokuapp.com/dialogue/{speaker}/${encodeURIComponent(val)}`;
+                document.getElementById('result').innerText = `http://api.dldialogue.xyz/dialogue/{speaker}/${encodeURIComponent(val)}`;
               }
             </script>
             <div class='alert alert-secondary'>
@@ -346,19 +347,19 @@
       </thead>
       <tbody>
         <tr>
-          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/Fleur/This%20is%20an%20example%20response/result.png</code></th>
+          <th scope="row"><code>http://api.dldialogue.xyz/dialogue/Fleur/This%20is%20an%20example%20response/result.png</code></th>
           <td><img src="/dialogue/Fleur/This%20is%20an%20example%20response/result.png" style="width: 150px;" alt="Example Response 1"></td>
         </tr>
         <tr>
-          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/intro/Fleur/Budding%20Artist/result.png?nobg</code></th>
+          <th scope="row"><code>http://api.dldialogue.xyz/intro/Fleur/Budding%20Artist/result.png?nobg</code></th>
           <td><img src="/intro/Fleur/Budding%20Artist/result.png?nobg&s=1.5" style="width: 150px;" alt="Example Response 2"></td>
         </tr>
         <tr>
-          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/Fleur/spooooky/result.png?r=180&o=0.75</code></th>
+          <th scope="row"><code>http://api.dldialogue.xyz/dialogue/Fleur/spooooky/result.png?r=180&o=0.75</code></th>
           <td><img src="/dialogue/Fleur/spooooky/result.png?r=180&o=0.75" style="width: 150px;" alt="Example Response 3"></td>
         </tr>
         <tr>
-          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/%3F%3F%3F/Excuse%20you%2C%20I'm%20not%20LOST!%0AI'm%20an%20artist./result.png?e=exclamation&id=fleur</code></th>
+          <th scope="row"><code>http://api.dldialogue.xyz/dialogue/%3F%3F%3F/Excuse%20you%2C%20I'm%20not%20LOST!%0AI'm%20an%20artist./result.png?e=exclamation&id=fleur</code></th>
           <td><img src="/dialogue/%3F%3F%3F/Excuse%20you%2C%20I'm%20not%20LOST!%0AI'm%20an%20artist./result.png?e=exclamation&id=fleur" style="width: 150px;" alt="Example Response 1"></td>
         </tr>
       </tbody>
