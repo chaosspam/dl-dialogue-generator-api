@@ -87,7 +87,7 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
 
 });
 
-app.get('/:name/:text/result.png', async (req, res) => {
+app.get('/:name/:text', async (req, res) => {
 
   if (!fm) {
     await setupLookup();
