@@ -17,24 +17,16 @@ app.get('/', (req, res) => {
 
 app.get('/:type/:name/:text/result.png', async (req, res) => {
 
-  if(!fm) {
+  if (!fm) {
     await setupLookup();
   }
 
-  let approximated = fm.get(req.query.id).value;
+  let userInput = req.query.id ? req.query.id : req.params.name;
+  let approximated = fm.get(userInput).value;
   let characterId = approximated ? portraitData[approximated] : '100001_01';
-  console.log(characterId);
 
   const properties = {
-    layers: [{
-      'image': req.query.src ? req.query.src : `${PORTRAIT_API}${characterId}/${characterId}_base.png`,
-      'offsetX': req.query.x ? parseFloat(req.query.x) : 0,
-      'offsetY': req.query.y ? parseFloat(req.query.y) : 120,
-      'rotation': req.query.r ? parseFloat(req.query.r) : 0,
-      'scale': req.query.s ? parseFloat(req.query.s) : 1,
-      'opacity': req.query.o ? parseFloat(req.query.o) : 1,
-      'flipX': req.query.flipx ? req.query.flipx === 'true' : false
-    }],
+    layers: [],
     settings: {
       speaker: req.params.name,
       dialogueText: req.params.text,
@@ -46,6 +38,40 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
       emotionOffsetY: req.query.ey ? parseFloat(req.query.ey) : 0
     }
   };
+
+  if (req.query.nobg === undefined) {
+    if(req.query.bg) {
+      properties.layers.push({
+        'image': req.query.bg,
+        'offsetX': req.query.bgx ? parseFloat(req.query.bgx) : 0,
+        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) : 155,
+        'rotation': req.query.bgr ? parseFloat(req.query.bgr) : 0,
+        'scale': req.query.bgs ? parseFloat(req.query.bgs) : 1,
+        'opacity': req.query.bgo ? parseFloat(req.query.bgo) : 1,
+        'flipX': req.query.bgflipx !== undefined
+      });
+    } else {
+      properties.layers.push({
+        'image': 'https://dragalialost.wiki/images/b/b4/Sty_bg_0024_100_00.png',
+        'offsetX': req.query.bgx ? parseFloat(req.query.bgx) : 0,
+        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) : 155,
+        'rotation': req.query.bgr ? parseFloat(req.query.bgr) : 0,
+        'scale': req.query.bgs ? parseFloat(req.query.bgs) : 1,
+        'opacity': req.query.bgo ? parseFloat(req.query.bgo) : 1,
+        'flipX': req.query.bgflipx !== undefined
+      });
+    }
+  }
+
+  properties.layers.push({
+    'image': req.query.src ? req.query.src : `${PORTRAIT_API}${characterId}/${characterId}_base.png`,
+    'offsetX': req.query.x ? parseFloat(req.query.x) : 0,
+    'offsetY': req.query.y ? parseFloat(req.query.y) : 120,
+    'rotation': req.query.r ? parseFloat(req.query.r) : 0,
+    'scale': req.query.s ? parseFloat(req.query.s) : 1,
+    'opacity': req.query.o ? parseFloat(req.query.o) : 1,
+    'flipX': req.query.flipx !== undefined
+  });
 
   const buffer = await canvas.drawDialogueScreen(properties);
 
@@ -62,7 +88,7 @@ function validateFont(font) {
 }
 
 function validateEmotion(emotion) {
-  return ['none', 'anger', 'bad', 'exclamation', 'heart', 'inspiration', 'note', 'notice', 'question', 'sleep', 'sweat' ].includes(emotion);
+  return ['none', 'anger', 'bad', 'exclamation', 'heart', 'inspiration', 'note', 'notice', 'question', 'sleep', 'sweat'].includes(emotion);
 }
 
 async function setupLookup() {
@@ -70,7 +96,7 @@ async function setupLookup() {
     let response = await axios.get(PORTRAIT_API + 'localizedDirData.json');
     data = response.data.fileList;
     portraitData = {};
-    for(let characterId in data) {
+    for (let characterId in data) {
       portraitData[data[characterId].en_us] = characterId;
     }
     let keys = Object.keys(portraitData);
