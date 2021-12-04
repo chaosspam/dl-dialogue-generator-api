@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.status(200).sendFile(path.join(__dirname, '/index.html'));
 });
 
-app.get('/:type/:name/:text/result.png', async (req, res) => {
+app.get('/:type/:name/:text', async (req, res) => {
 
   if (!fm) {
     await setupLookup();
