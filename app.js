@@ -1,6 +1,7 @@
 const DragaliaCanvas = require('./canvas.js');
 const FuzzyMatching = require('fuzzy-matching');
 const express = require('express');
+const path = require('path');
 const axios = require('axios');
 
 const app = express();
@@ -12,7 +13,7 @@ let portraitData = null;
 let fm = null;
 
 app.get('/', (req, res) => {
-  res.type('text').status(200).send('test');
+  res.status(200).sendFile(path.join(__dirname, '/index.html'));
 });
 
 app.get('/:type/:name/:text/result.png', async (req, res) => {
@@ -30,7 +31,7 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
     settings: {
       speaker: req.params.name,
       dialogueText: req.params.text,
-      dialogueType: req.params.type,
+      dialogueType: validateType(req.params.type),
       font: req.query.f ? validateFont(req.query.f) : 'en',
       emotion: req.query.e ? validateEmotion(req.query.e) : 'none',
       emotionSide: req.query.es ? (req.query.es === 'r' ? 'r' : 'l') : 'l',
@@ -44,7 +45,7 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
       properties.layers.push({
         'image': req.query.bg,
         'offsetX': req.query.bgx ? parseFloat(req.query.bgx) : 0,
-        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) : 155,
+        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) + 155 : 155,
         'rotation': req.query.bgr ? parseFloat(req.query.bgr) : 0,
         'scale': req.query.bgs ? parseFloat(req.query.bgs) : 1,
         'opacity': req.query.bgo ? parseFloat(req.query.bgo) : 1,
@@ -54,7 +55,7 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
       properties.layers.push({
         'image': 'https://dragalialost.wiki/images/b/b4/Sty_bg_0024_100_00.png',
         'offsetX': req.query.bgx ? parseFloat(req.query.bgx) : 0,
-        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) : 155,
+        'offsetY': req.query.bgy ? parseFloat(req.query.bgy) + 155 : 155,
         'rotation': req.query.bgr ? parseFloat(req.query.bgr) : 0,
         'scale': req.query.bgs ? parseFloat(req.query.bgs) : 1,
         'opacity': req.query.bgo ? parseFloat(req.query.bgo) : 1,
@@ -63,17 +64,20 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
     }
   }
 
-  properties.layers.push({
-    'image': req.query.src ? req.query.src : `${PORTRAIT_API}${characterId}/${characterId}_base.png`,
-    'offsetX': req.query.x ? parseFloat(req.query.x) : 0,
-    'offsetY': req.query.y ? parseFloat(req.query.y) : 120,
-    'rotation': req.query.r ? parseFloat(req.query.r) : 0,
-    'scale': req.query.s ? parseFloat(req.query.s) : 1,
-    'opacity': req.query.o ? parseFloat(req.query.o) : 1,
-    'flipX': req.query.flipx !== undefined
-  });
+  if (req.query.noportrait === undefined) {
+    properties.layers.push({
+      'image': req.query.pt ? req.query.pt : `${PORTRAIT_API}${characterId}/${characterId}_base.png`,
+      'offsetX': req.query.x ? parseFloat(req.query.x) : 0,
+      'offsetY': req.query.y ? parseFloat(req.query.y) + 120 : 120,
+      'rotation': req.query.r ? parseFloat(req.query.r) : 0,
+      'scale': req.query.s ? parseFloat(req.query.s) : 1,
+      'opacity': req.query.o ? parseFloat(req.query.o) : 1,
+      'flipX': req.query.flipx !== undefined
+    });
+  }
 
   const buffer = await canvas.drawDialogueScreen(properties);
+
 
   res.writeHead(200, {
     'Content-Type': 'image/png',
@@ -83,12 +87,16 @@ app.get('/:type/:name/:text/result.png', async (req, res) => {
 
 });
 
+function validateType(type) {
+  return ['dialogue', 'intro', 'caption', 'full', 'narration', 'book'].includes(type) ? type : 'dialogue';
+}
+
 function validateFont(font) {
   return ['en', 'ja', 'zh_tw', 'zh_cn'].includes(font) ? font : 'en';
 }
 
 function validateEmotion(emotion) {
-  return ['none', 'anger', 'bad', 'exclamation', 'heart', 'inspiration', 'note', 'notice', 'question', 'sleep', 'sweat'].includes(emotion);
+  return ['none', 'anger', 'bad', 'exclamation', 'heart', 'inspiration', 'note', 'notice', 'question', 'sleep', 'sweat'].includes(emotion) ? emotion : 'none';
 }
 
 async function setupLookup() {
@@ -97,6 +105,7 @@ async function setupLookup() {
     data = response.data.fileList;
     portraitData = {};
     for (let characterId in data) {
+      portraitData[characterId] = characterId;
       portraitData[data[characterId].en_us] = characterId;
     }
     let keys = Object.keys(portraitData);
@@ -109,3 +118,4 @@ async function setupLookup() {
 app.use(express.static('public'));
 const PORT = process.env.PORT || 8000;
 app.listen(PORT);
+console.log(`Application started and listening on port ${PORT}`);

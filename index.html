@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Dragalia Lost Dialogue Screen Generator">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dldialogue.xyz/">
+  <meta property="og:image" content="https://dldialogue.xyz/images/og-thumbnail.png">
+  <meta property="og:description" content="A tool for generating dialogue screens from Dragalia Lost">
+  <meta name="theme-color" content="#1b4f79">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Dragalia Lost Dialogue Generator API Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Lato&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <style>
+    body {
+      background-color: #eee;
+      color: #434343;
+      padding: 0 60px;
+      margin: 10px;
+      border: 4px solid #434343;
+      font-family: 'Lato', "Helvetica Neue", Helvetica, Arial, "PingFang TC", "黑體-繁", "Heiti TC",
+        "蘋果儷中黑", "Apple LiGothic Medium", "微軟正黑體", "Microsoft JhengHei", sans-serif;
+    }
+    h1, h2, h3 {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <main class='container mt-5'>
+    <h1 style="text-transform:uppercase">Dragalia Lost Dialogue Generator API</h1>
+    <p class='lead'> The Dragalia Lost Dialogue Generator API generates an image of the dialogue screen from the game Dragalia Lost</p>
+    <h2>Generating Image</h2>
+    <p>Generate a dialogue screen image</p>
+
+    <h3 class="mt-5">Request</h3>
+    <hr />
+
+    <h4 class="h5 mt-5"><code>GET</code> /{type}/{name}/{text}/result.png</h4>
+    <hr />
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Parameter</th>
+          <th scope="col">Type</th>
+          <th scope="col">Description</th>
+          <th scope="col">Example Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">type</th>
+          <td>string</td>
+          <td>
+            The dialogue type to generate. <br />
+            Default: dialogue<br />
+            Valid values are
+            <ul>
+              <li>dialogue</li>
+              <li>intro</li>
+              <li>caption</li>
+              <li>full</li>
+              <li>narration</li>
+              <li>book</li>
+            </ul>
+          </td>
+          <td>dialogue</td>
+        </tr>
+        <tr>
+          <th scope="row">name</th>
+          <td>string</td>
+          <td>
+            Name of the speaker of the dialogue. <br />
+            If none of <code>id</code>, <code>pt</code>, and <code>noportrait</code> query parameter are supplied, the
+            API will attempt to use the find and use the portrait that matches this parameter the closest.
+          </td>
+          <td>Fleur</td>
+        </tr>
+        <tr>
+          <th scope="row">text</th>
+          <td>string</td>
+          <td>
+            The text content of the dialogue. Certain characters (such as spaces or question marks) may have to be replaced by escape
+            sequences representing the UTF-8 encoding of the character.<br/>
+            <textarea name="" cols="30" rows="4" oninput="toURI(this.value)" placeholder="Type here to see how characters should be escaped" autocomplete="off"></textarea>
+            <script>
+              function toURI(val) {
+                document.getElementById('result').innerText = `http://dl-dialogue-generator-api.herokuapp.com/dialogue/{speaker}/${encodeURIComponent(val)}`;
+              }
+            </script>
+            <div class='alert alert-secondary'>
+              <p id='result'></p>
+            </div>
+
+          </td>
+          <td>This%20is%20an%20example%20response</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 class="h5 mt-5">Query</h4>
+    <hr />
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Query</th>
+          <th scope="col">Type</th>
+          <th scope="col">Description</th>
+          <th scope="col">Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">nobg</th>
+          <td>flag</td>
+          <td>
+            If provided, the background image will be empty.
+          </td>
+          <td>?nobg</td>
+        </tr>
+        <tr>
+          <th scope="row">bg</th>
+          <td>string</td>
+          <td>
+            URL of the background image. If this parameter is not supplied, the background
+            image will be the interior of the halidom by default.
+            Certain characters (such as colons and slashes) may have to be replaced by escape
+            sequences representing the UTF-8 encoding of the character
+          </td>
+          <td>?bg=https%3A%2F%2Fdragalialost.wiki%2Fimages%2Fc%2Fc3%2FMainstory_001001_00.png</td>
+        </tr>
+        <tr>
+          <th scope="row">bgx</th>
+          <td>float</td>
+          <td>
+            The x-offset of the background. Default: 0
+          </td>
+          <td>?bgx=10</td>
+        </tr>
+        <tr>
+          <th scope="row">bgy</th>
+          <td>float</td>
+          <td>
+            The y-offset of the background. Default: 0
+          </td>
+          <td>?bgy=10</td>
+        </tr>
+        <tr>
+          <th scope="row">bgr</th>
+          <td>float</td>
+          <td>
+            The rotation of the background in degrees. Default: 0
+          </td>
+          <td>?bgr=180</td>
+        </tr>
+        <tr>
+          <th scope="row">bgs</th>
+          <td>float</td>
+          <td>
+            The scale of the background. Default: 1
+          </td>
+          <td>?bgs=1.5</td>
+        </tr>
+        <tr>
+          <th scope="row">bgo</th>
+          <td>float</td>
+          <td>
+            The opacity of the background. Default: 1
+          </td>
+          <td>?bgo=0.75</td>
+        </tr>
+        <tr>
+          <th scope="row">bgflipx</th>
+          <td>flag</td>
+          <td>
+            If provided, the background image will be flipped on the x-axis.
+          </td>
+          <td>?bgflipx</td>
+        </tr>
+
+        <tr>
+          <th scope="row">noportrait</th>
+          <td>flag</td>
+          <td>
+            If provided, the portrait image will be empty.
+          </td>
+          <td>?noportrait</td>
+        </tr>
+        <tr>
+          <th scope="row">id</th>
+          <td>string</td>
+          <td>
+            The character ID of the portrait image or the name of the character (the
+            API will attempt to use the find and use the portrait that matches this parameter the closest). If this parameter is not supplied,
+            the portrait image will be the closest matching portrait of the speaker's name by default.
+          </td>
+          <td>?id=110319_01<br />?id=fleur<br />?id=flerr</td>
+        </tr>
+        <tr>
+          <th scope="row">pt</th>
+          <td>string</td>
+          <td>
+            URL of the portrait image, this parameter will override <code>pt</code>. If this parameter is not supplied, the portrait
+            image will be the closest matching portrait of the speaker's name by default.
+            Certain characters (such as colons and slashes) may have to be replaced by escape
+            sequences representing the UTF-8 encoding of the character
+          </td>
+          <td>?pt=https%3A%2F%2Fdragalialost.wiki%2Fimages%2Fc%2Fc3%2FMainstory_001001_00.png</td>
+        </tr>
+        <tr>
+          <th scope="row">x</th>
+          <td>float</td>
+          <td>
+            The x-offset of the portrait. Default: 0
+          </td>
+          <td>?x=10</td>
+        </tr>
+        <tr>
+          <th scope="row">y</th>
+          <td>float</td>
+          <td>
+            The y-offset of the portrait. Default: 0
+          </td>
+          <td>?y=10</td>
+        </tr>
+        <tr>
+          <th scope="row">r</th>
+          <td>float</td>
+          <td>
+            The rotation of the portrait in degrees. Default: 0
+          </td>
+          <td>?r=180</td>
+        </tr>
+        <tr>
+          <th scope="row">s</th>
+          <td>float</td>
+          <td>
+            The scale of the portrait. Default: 1
+          </td>
+          <td>?s=1.5</td>
+        </tr>
+        <tr>
+          <th scope="row">o</th>
+          <td>float</td>
+          <td>
+            The opacity of the portrait. Default: 1
+          </td>
+          <td>?o=0.75</td>
+        </tr>
+        <tr>
+          <th scope="row">flipx</th>
+          <td>flag</td>
+          <td>
+            If provided, the portrait image will be flipped on the x-axis.
+          </td>
+          <td>?flipx</td>
+        </tr>
+        <tr>
+          <th scope="row">f</th>
+          <td>string</td>
+          <td>
+            The font that the text for the dialogue should be drawn in. Default: 'en'<br />
+            Valid values are
+            <ul>
+              <li>en</li>
+              <li>ja</li>
+              <li>zh_tw</li>
+              <li>zh_cn</li>
+            </ul>
+          </td>
+          <td>?f=ja</td>
+        </tr>
+        <tr>
+          <th scope="row">e</th>
+          <td>string</td>
+          <td>
+            The emotion that should be drawn in the emotion bubble. If this parameter is not provided, or is set to 'none',
+            the emotion bubble will not be drawn
+            Default: 'none'<br />
+            Valid values are
+            <ul>
+              <li>none</li>
+              <li>anger</li>
+              <li>bad</li>
+              <li>exclamation</li>
+              <li>heart</li>
+              <li>inspiration</li>
+              <li>note</li>
+              <li>notice</li>
+              <li>question</li>
+              <li>sleep</li>
+              <li>sweat</li>
+            </ul>
+          </td>
+          <td>?e=anger</td>
+        </tr>
+        <tr>
+          <th scope="row">es</th>
+          <td>string</td>
+          <td>
+            The side the emotion bubble should be on. 'l' for left and 'r' for right. Default: 'l'<br />
+            Valid values are
+            <ul>
+              <li>l</li>
+              <li>r</li>
+            </ul>
+          </td>
+          <td>?es=r</td>
+        </tr>
+        <tr>
+          <th scope="row">ex</th>
+          <td>float</td>
+          <td>
+            The y-offset of the emotion bubble. Default: 0
+          </td>
+          <td>?ex=10</td>
+        </tr>
+        <tr>
+          <th scope="row">ey</th>
+          <td>float</td>
+          <td>
+            The y-offset of the emotion bubble. Default: 0
+          </td>
+          <td>?ey=10</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 class="mt-5">Responses</h3>
+    <p>Dialogue screen image as a <code>.png</code> file</p>
+    <hr />
+
+    <h4 class="h5 mt-5">Body <code class="float-end">image/png</code></h4>
+    <hr />
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Example Request</th>
+          <th scope="col">Example Response</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/Fleur/This%20is%20an%20example%20response/result.png</code></th>
+          <td><img src="/dialogue/Fleur/This%20is%20an%20example%20response/result.png" style="width: 150px;" alt="Example Response 1"></td>
+        </tr>
+        <tr>
+          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/intro/Fleur/Budding%20Artist/result.png?nobg</code></th>
+          <td><img src="/intro/Fleur/Budding%20Artist/result.png?nobg&s=1.5" style="width: 150px;" alt="Example Response 2"></td>
+        </tr>
+        <tr>
+          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/Fleur/spooooky/result.png?r=180&o=0.75</code></th>
+          <td><img src="/dialogue/Fleur/spooooky/result.png?r=180&o=0.75" style="width: 150px;" alt="Example Response 3"></td>
+        </tr>
+        <tr>
+          <th scope="row"><code>http://dl-dialogue-generator-api.herokuapp.com/dialogue/%3F%3F%3F/Excuse%20you%2C%20I'm%20not%20LOST!%0AI'm%20an%20artist./result.png?e=exclamation&id=fleur</code></th>
+          <td><img src="/dialogue/%3F%3F%3F/Excuse%20you%2C%20I'm%20not%20LOST!%0AI'm%20an%20artist./result.png?e=exclamation&id=fleur" style="width: 150px;" alt="Example Response 1"></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </main>
+</body>
+</html>

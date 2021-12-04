@@ -15,16 +15,12 @@ const furiganaSize = 15;
 const emotionFromSide = 180;
 const emotionYPos = 250;
 const textures = {};
-let drawing = false;
 
 class DragaliaCanvas {
   /**
    * Draws the dialogue screen based on inputs
    */
   async drawDialogueScreen(properties) {
-    if (drawing) return;
-    drawing = true;
-
     try {
       // Get canvas context
       const canvas = createCanvas(width, height);
@@ -71,7 +67,6 @@ class DragaliaCanvas {
 
       // Wait for font load
       this.drawDialogueText(dialogueType, ctx, lang, properties);
-      drawing = false;
 
       // Save to buffer
       return Buffer.from(canvas.toBuffer('image/png'), 'binary');
@@ -79,7 +74,6 @@ class DragaliaCanvas {
     } catch (error) {
       console.error(error);
     }
-    drawing = false;
   }
 
   async loadTexture(key) {
